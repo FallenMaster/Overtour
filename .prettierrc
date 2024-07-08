@@ -1,0 +1,6 @@
+{
+  "singleQuote": true,
+  "bracketSameLine": false,
+  "endOfLine": "crlf",
+  "printWidth": 120
+}

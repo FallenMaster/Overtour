@@ -1,35 +1,51 @@
-import Route from '@ioc:Adonis/Core/Route';
+import router from '@adonisjs/core/services/router';
+import { middleware } from '#start/kernel';
 
-Route.post('api/register', 'Auth.register');
-Route.post('api/login' , 'Auth.login');
-Route.post('api/logout' , 'Auth.logout');
-Route.get('api/user' , 'Auth.getUserInfo');
+const AuthController = () => import('#controllers/auth');
+const CrawlerController = () => import('#controllers/crawler');
+const FoodCalculatorController = () => import('#controllers/food_calculator');
+const ToursController = () => import('#controllers/tours');
 
-Route.get('api/regions', 'Tours.getRegions');
+router
+  .group(() => {
+    router.get('tours', [ToursController, 'getTours']);
+    router.get('tours/:id', [ToursController, 'getTour']);
+    router.get('regions', [ToursController, 'getRegions']);
 
-Route.any('api/tour', 'Tours.getTours');
-Route.get('api/tour/:id', 'Tours.getTour');
+    router.group(() => {
+      router.get('crawler/club/:id', [CrawlerController, 'parseClubRoutes']);
+      router.get('crawler/club/:id/detailed', [CrawlerController, 'parseRoutes']);
+    });
+    // .use([middleware.auth(), middleware.admin()]);
 
-Route.group(()=>{
-   Route.get('api/drafts', 'Tours.getAllDrafts');
-   Route.post('api/crawler/club_tours', 'Crawler.getClubTours');
-   Route.post('api/crawler/tour_detail', 'Crawler.getTourDetails');
-   Route.post('api/crawler/parse_details_by_club', 'Crawler.getDetailsByClub');
-}).middleware(['auth', 'admin']);
+    // TODO сделать основным парсером
+    router.get('routes', [ToursController, 'getRoutes']);
 
-Route.get('api/dish', 'FoodCalculator.dishList');
-Route.get('api/menu', 'FoodCalculator.menuList');
-Route.get('api/ingredient', 'FoodCalculator.ingredientsList');
-Route.group(()=>{
-   Route.post('api/dish', 'FoodCalculator.addDish');
-   Route.put('api/dish/:id', 'FoodCalculator.editDish');
-   Route.delete('api/dish/:id', 'FoodCalculator.deleteDish');
-   Route.post('api/dish/is_used/:id', 'FoodCalculator.checkIsDishUsed');
-   Route.post('api/ingredient', 'FoodCalculator.addIngredient');
-   Route.put('api/ingredient/:id', 'FoodCalculator.editIngredient');
-   Route.delete('api/ingredient/:id', 'FoodCalculator.deleteIngredient');
-   Route.post('api/menu', 'FoodCalculator.addMenu');
-   Route.put('api/menu/:id/choose', 'FoodCalculator.chooseMenu');
-   Route.put('api/menu/:id', 'FoodCalculator.updateMenu');
-   Route.delete('api/menu/:id', 'FoodCalculator.deleteMenu');
-}).middleware('auth');
+    router.get('dish', [FoodCalculatorController, 'dishList']);
+    router.get('menu', [FoodCalculatorController, 'menuList']);
+    router.get('ingredient', [FoodCalculatorController, 'ingredientsList']);
+
+    router.post('register', [AuthController, 'register']);
+    router.post('login', [AuthController, 'login']);
+    router.post('logout', [AuthController, 'logout']);
+    router.get('user', [AuthController, 'getUserInfo']);
+
+    router
+      .group(() => {
+        router.post('dish', [FoodCalculatorController, 'addDish']).use(middleware.auth());
+        router.put('dish/:id', [FoodCalculatorController, 'editDish']);
+        router.delete('dish/:id', [FoodCalculatorController, 'deleteDish']);
+        router.post('dish/is_used/:id', [FoodCalculatorController, 'checkIsDishUsed']);
+        router.post('ingredient', [FoodCalculatorController, 'addIngredient']);
+        router.put('ingredient/:id', [FoodCalculatorController, 'editIngredient']);
+        router.delete('ingredient/:id', [FoodCalculatorController, 'deleteIngredient']);
+        router.post('menu', [FoodCalculatorController, 'addMenu']);
+        router.put('menu/:id/choose', [FoodCalculatorController, 'chooseMenu']);
+        router.put('menu/:id', [FoodCalculatorController, 'updateMenu']);
+        router.delete('menu/:id', [FoodCalculatorController, 'deleteMenu']);
+      })
+      .use([middleware.auth()]);
+  })
+  .prefix('/api');
+
+router.get('/', () => 'It works!');

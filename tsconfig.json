@@ -1,41 +1,10 @@
 {
-  "extends": "./node_modules/adonis-preset-ts/tsconfig",
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "build"
-  ],
+  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
   "compilerOptions": {
-    "outDir": "build",
     "rootDir": "./",
-    "sourceMap": true,
-    "strictNullChecks": false,
-    "paths": {
-      "App/*": [
-        "./app/*"
-      ],
-      "Config/*": [
-        "./config/*"
-      ],
-      "Contracts/*": [
-        "./contracts/*"
-      ],
-      "Database/*": [
-        "./database/*"
-      ]
-    },
-    "types": [
-      "@adonisjs/core",
-      "@adonisjs/repl",
-      "@adonisjs/session",
-      "@adonisjs/auth",
-      "@adonisjs/lucid"
-    ],
-    "lib": [
-      "es2017",
-      "dom"
-    ]
-  }
+    "outDir": "./build",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictNullChecks": false
+  },
 }
