@@ -1,6 +1,7 @@
 import logger from '@adonisjs/core/services/logger';
 import { DateTime } from 'luxon';
 import CommonRoute from '#common/clubs/common';
+import { parseNumberFromString } from '#common/parse';
 import { Region } from '#common/regions';
 import { Tag } from '#common/tags';
 import Route from '#models/route';
@@ -26,10 +27,10 @@ export class Yeti extends CommonRoute {
     this.link = route.link;
     this.club = route.club;
     this.setDifficulty(document);
-    this.setDescription(document);
+    this.setDescription(document, '#detail > div > div:nth-child(1) > div > div div');
     this.setRegion(document);
     this.setTag(document);
-    this.setImage(document);
+    this.setImage(document.querySelector('.gdlr-core-gallery-item a img')?.getAttribute('data-src'));
   }
 
   setDifficulty(document: Document) {
@@ -43,15 +44,6 @@ export class Yeti extends CommonRoute {
       }
     } catch (err) {
       logger.error({ link: this.link, parsedValue: 'difficulty', err }, 'Parsing error');
-    }
-  }
-
-  setDescription(document: Document) {
-    try {
-      this.description = document.querySelector('#detail > div > div:nth-child(1) > div > div div')
-        ?.textContent as string;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'description', err }, 'Parsing error');
     }
   }
 
@@ -109,16 +101,8 @@ export class Yeti extends CommonRoute {
     }
   }
 
-  setImage(document: Document) {
-    try {
-      this.image = document.querySelector('.gdlr-core-gallery-item a img')?.getAttribute('data-src') as string;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'image', err }, 'Parsing error');
-    }
-  }
-
   getTours(document: Document) {
-    const price = +(document.querySelector('.tourmaster-tail')?.textContent?.trim().replace(/\D/g, '') as string);
+    const price = parseNumberFromString(document.querySelector('.tourmaster-tail')?.textContent);
     const selectOptions = document.querySelectorAll('.tourmaster-tour-booking-date option');
     return Array.from(selectOptions.length ? selectOptions : document.querySelectorAll('[name="tour-date"]')).map(
       (dateStart: any) => {

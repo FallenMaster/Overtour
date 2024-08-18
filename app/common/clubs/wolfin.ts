@@ -1,6 +1,6 @@
 import logger from '@adonisjs/core/services/logger';
-import { DateTime } from 'luxon';
 import CommonRoute from '#common/clubs/common';
+import { parseDatesFromText, parseNumberFromString } from '#common/parse';
 import { Region } from '#common/regions';
 import { Tag } from '#common/tags';
 import Route from '#models/route';
@@ -35,10 +35,10 @@ export class Wolfin extends CommonRoute {
     }
 
     this.setDifficulty(document);
-    this.setDescription(document);
+    this.setDescription(document, '.info-text.typography');
     this.setRegion(document);
     // this.setTag(document);
-    this.setImage(document, route);
+    this.setImage(document.querySelector('.event-detailed__cover img').getAttribute('src'), route.link);
   }
 
   setDifficulty(document: Document) {
@@ -52,14 +52,6 @@ export class Wolfin extends CommonRoute {
     }
   }
 
-  setDescription(document: Document) {
-    try {
-      this.description = document.querySelector('.info-text.typography').textContent as string;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'description', err }, 'Parsing error');
-    }
-  }
-
   setRegion(document: Document) {
     try {
       const clubRegions = {
@@ -67,6 +59,7 @@ export class Wolfin extends CommonRoute {
         Карелия: Region.Karelia,
         'Республика Бурятия': Region.Baikal,
         'Коми; Ямал': Region.Ural,
+        'Ямал': Region.Ural,
         'Хабаровский край': Region.Khabarovsk,
         'Архангельская область': Region.Solovki,
       };
@@ -86,55 +79,16 @@ export class Wolfin extends CommonRoute {
   // TODO
   setTag(document: Document) {}
 
-  setImage(document: Document, route: Pick<Route, 'id' | 'title' | 'link' | 'club'>) {
-    try {
-      const url = new URL(route.link);
-      this.image = (url.origin + document.querySelector('.event-detailed__cover img').getAttribute('src')) as string;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'image', err }, 'Parsing error');
-    }
-  }
-
   getTours(document: Document) {
-    const price = +(document
-      .querySelector('.event-detailed-price__val')
-      ?.textContent?.trim()
-      .replace(/\D/g, '') as string);
-    const dates = document.querySelectorAll('.event-date__period');
-    const months = [
-      'января',
-      'февраля',
-      'марта',
-      'апреля',
-      'мая',
-      'июня',
-      'июля',
-      'августа',
-      'сентября',
-      'октября',
-      'ноября',
-      'декабря',
-    ];
-
     if (document.querySelectorAll('.event-date__period')[0].textContent.trim() === 'Под заказ') {
       return [];
     }
 
-    return Array.from(dates).map((dates: any) => {
-      dates = dates.textContent.match(/(\d+)\s*(\W*)\s*(\d*) – (\d+)\s*(\W*)\s*(\d+)/i);
+    const price = parseNumberFromString(document.querySelector('.event-detailed-price__val')?.textContent);
+    const dates = document.querySelectorAll('.event-date__period');
 
-      const getDate = (dateString: string) => {
-        return +dateString < 10 ? `0${dateString}` : dateString;
-      };
-
-      const getMonth = (monthString: string) => {
-        const month = months.indexOf(monthString.trim()) + 1;
-        return +month < 10 ? `0${month}` : month;
-      };
-
-      const dateFrom = DateTime.fromISO(`${dates[3]}-${getMonth(dates[2])}-${getDate(dates[1])}`);
-      const dateTo = DateTime.fromISO(`${dates[6]}-${getMonth(dates[5])}-${getDate(dates[4])}`);
-
+    return Array.from(dates).map((date: Element) => {
+      const { dateFrom, dateTo } = parseDatesFromText(date.textContent);
       return {
         dateFrom,
         dateTo,

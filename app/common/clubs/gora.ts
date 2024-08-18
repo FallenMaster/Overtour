@@ -31,10 +31,10 @@ export class Gora extends CommonRoute {
     }
 
     this.setDifficulty(document);
-    this.setDescription(document);
+    this.setDescription(document, '.text_block');
     this.setRegion(document);
     // this.setTag(document);
-    this.setImage(document, route);
+    this.setImage(document.querySelector('.cont .params + img').getAttribute('data-src'), route.link);
   }
 
   setDifficulty(document: Document) {
@@ -45,14 +45,6 @@ export class Gora extends CommonRoute {
       }
     } catch (err) {
       logger.error({ link: this.link, parsedValue: 'difficulty', err }, 'Parsing error');
-    }
-  }
-
-  setDescription(document: Document) {
-    try {
-      this.description = document.querySelector('.text_block').textContent as string;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'description', err }, 'Parsing error');
     }
   }
 
@@ -102,15 +94,6 @@ export class Gora extends CommonRoute {
       this.tag = clubTags[tag];
     } catch (err) {
       logger.error({ link: this.link, parsedValue: 'tag', err }, 'Parsing error');
-    }
-  }
-
-  setImage(document: Document, route: Pick<Route, 'id' | 'title' | 'link' | 'club'>) {
-    try {
-      const url = new URL(route.link);
-      this.image = `${url.origin}/${document.querySelector('.cont .params + img').getAttribute('data-src')}`;
-    } catch (err) {
-      logger.error({ link: this.link, parsedValue: 'image', err }, 'Parsing error');
     }
   }
 
