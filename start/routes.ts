@@ -14,7 +14,7 @@ router
 
     router.group(() => {
       router.get('crawler/club/:id', [CrawlerController, 'parseClubRoutes']);
-      router.get('crawler/club/:id/detailed', [CrawlerController, 'parseRoutes']);
+      router.get('crawler/club/:id/detailed', [CrawlerController, 'parseTours']);
     });
     // .use([middleware.auth(), middleware.admin()]);
 

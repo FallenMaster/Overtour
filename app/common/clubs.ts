@@ -1,3 +1,4 @@
+import { parseGoraRoutes } from '#common/clubs/gora';
 import { parseWolfinRoutes } from '#common/clubs/wolfin';
 import { parseYetiRoutes } from '#common/clubs/yeti';
 import Route from '#models/route';
@@ -241,7 +242,7 @@ export const clubs: Clubs = {
       title: '.name a',
       link: 'a',
     },
-    parseDetails: (): any => {},
+    parseDetails: parseGoraRoutes,
   },
   [Club.Wolfin]: {
     id: Club.Wolfin,

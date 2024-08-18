@@ -1,3 +1,6 @@
+import * as chrono from 'chrono-node';
+import { DateTime } from 'luxon';
+
 export const trimAllWhitespaces = (text: string) => {
    return text.replace(/\s+/g, '');
 };
@@ -25,11 +28,15 @@ const prepareDateToDBFormat = (day: string, month: string, year: string): string
    return `${fullYear}-${fullMonth}-${fullDay}${zone}`;
 };
 
-export const parseDates = (text?: string | null): string[] => {
-   let output = trimAllWhitespaces(text || '');
-   const firstDate = parseDateSingle(output);
-   const second = output.match(/(\d+)[\.|\/](\d+)[\.|\/](\d+)/g);
-   let secondDate = Array.isArray(second) ? parseDateSingle(second[1]): '';
+export const parseNumberFromString = (text: string): number => {
+   return +text.replace(/[^\d]/g, '');
+}
 
-   return isPeriod(output) ? [firstDate, secondDate] : [firstDate];
+export const parseDatesFromText = (text: string) => {
+   const dates = chrono.ru.parse(text);
+   const dateTo = dates[1]?.start?.date() || dates[0]?.end?.date() || null;
+   return {
+      dateFrom: DateTime.fromJSDate(dates[0]?.start?.date()),
+      dateTo: dateTo ? DateTime.fromJSDate(dateTo) : null,
+   }
 }

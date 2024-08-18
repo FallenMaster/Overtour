@@ -20,6 +20,7 @@
     "@adonisjs/static": "1.1.1",
     "@vinejs/vine": "1.8.0",
     "bcrypt": "5.1.1",
+    "chrono-node": "2.7.6",
     "edge.js": "6.0.2",
     "jimp": "0.16.1",
     "jsdom": "24.1.0",

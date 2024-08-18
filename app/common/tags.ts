@@ -10,6 +10,7 @@ export enum Tag {
   Bike,
   Combined,
   Weekend,
+  Skates,
 }
 
 export const tags = [
@@ -23,5 +24,6 @@ export const tags = [
   { id: Tag.Moto, name: 'Мото' },
   { id: Tag.Bike, name: 'Вело' },
   { id: Tag.Combined, name: 'Комбинированный' },
+  { id: Tag.Skates, name: 'Коньки' },
   { id: Tag.Weekend, name: 'Выходного дня' },
 ];

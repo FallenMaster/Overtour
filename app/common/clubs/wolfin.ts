@@ -83,6 +83,7 @@ export class Wolfin extends CommonRoute {
     }
   }
 
+  // TODO
   setTag(document: Document) {}
 
   setImage(document: Document, route: Pick<Route, 'id' | 'title' | 'link' | 'club'>) {

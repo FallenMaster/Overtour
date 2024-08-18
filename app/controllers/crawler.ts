@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http';
+import logger from '@adonisjs/core/services/logger';
 import { ModelObject } from '@adonisjs/lucid/types/model';
 import { JSDOM } from 'jsdom';
 import { clubs } from '#common/clubs';
+import { parseNumberFromString } from '#common/parse';
 import { BaseRoute } from '#common/route';
 import Route from '#models/route';
 import Tour from '#models/tour';
@@ -49,20 +51,31 @@ export default class Crawler {
     return output;
   }
 
-  async parseRoutes({ request }: HttpContext): Promise<Route[]> {
+  async parseTours({ request }: HttpContext): Promise<Route[]> {
     const { id } = request.params();
     const club = clubs[id];
     const routes = await Route.query().where('club', id);
 
     for (let route of routes) {
-      const document = await JSDOM.fromURL(route.link).then(({ window }) => window.document);
-      const detailed = club.parseDetails(route, document);
+      const document = await JSDOM.fromURL(route.link)
+        .then(({ window }) => window.document)
+        .catch(async (err) => {
+          if (parseNumberFromString(err.message) === 404) {
+            logger.warn(`Route not found ${route.link}`);
+            const outdatedRoute = await Route.findBy('link', route.link);
+            await outdatedRoute.delete();
+          }
+        });
 
-      route.fill(detailed.route);
-      await route.save();
+      if (document) {
+        const detailed = club.parseDetails(route, document);
 
-      const uniqueTours = await this.getNotExistingTours(detailed.tours, route.id);
-      await route.related('tours').createMany(uniqueTours);
+        route.fill(detailed.route);
+        await route.save();
+
+        const uniqueTours = await this.getNotExistingTours(detailed.tours, route.id);
+        await route.related('tours').createMany(uniqueTours);
+      }
     }
 
     return Route.query().where('club', id).preload('tours');
