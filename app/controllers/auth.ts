@@ -16,10 +16,7 @@ export default class AuthController {
       const { email, password } = request.only(['email', 'password']);
 
       const user = await User.verifyCredentials(email, password);
-      await auth.use('web').login(user);
-
-      // FIXME return token
-      return user;
+      return auth.use('web').login(user);
    }
 
    async logout({ auth }: HttpContext) {
@@ -28,5 +25,9 @@ export default class AuthController {
 
    async getUserInfo({ auth }: HttpContext) {
       return auth.authenticate();
+   }
+
+   async getSession({ auth }: HttpContext) {
+      return auth.check();
    }
 }

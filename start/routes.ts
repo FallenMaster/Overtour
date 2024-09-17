@@ -25,10 +25,15 @@ router
     router.get('menu', [FoodCalculatorController, 'menuList']);
     router.get('ingredient', [FoodCalculatorController, 'ingredientsList']);
 
-    router.post('register', [AuthController, 'register']);
-    router.post('login', [AuthController, 'login']);
-    router.post('logout', [AuthController, 'logout']);
-    router.get('user', [AuthController, 'getUserInfo']);
+    router
+      .group(() => {
+        router.post('register', [AuthController, 'register']);
+        router.post('login', [AuthController, 'login']);
+        router.get('session', [AuthController, 'getSession']);
+        router.post('logout', [AuthController, 'logout']);
+        router.get('user', [AuthController, 'getUserInfo']);
+      })
+      .prefix('/auth');
 
     router
       .group(() => {

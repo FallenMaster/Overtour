@@ -3,13 +3,11 @@ import { InferHashers } from '@adonisjs/core/types';
 
 const hashConfig = defineConfig({
   default: 'bcrypt',
-
   list: {
     bcrypt: drivers.bcrypt({
       rounds: 10,
       saltSize: 16,
-      // @ts-ignore
-      version: '2b'
+      version: 98
     })
   }
 });
