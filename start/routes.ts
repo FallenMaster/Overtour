@@ -35,6 +35,11 @@ router
       })
       .prefix('/auth');
 
+      router
+        .group(() => {
+          router.get('user/admin', [AuthController, 'isAdmin']);
+        }).use([middleware.auth()]);
+
     router
       .group(() => {
         router.post('dish', [FoodCalculatorController, 'addDish']).use(middleware.auth());

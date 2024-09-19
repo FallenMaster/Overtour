@@ -1,4 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http';
+import { UserRole } from '#common/constants';
 import User from '#models/user';
 import { registerValidator } from '#validators/auth';
 
@@ -29,5 +30,9 @@ export default class AuthController {
 
    async getSession({ auth }: HttpContext) {
       return auth.check();
+   }
+
+   async isAdmin({ auth }: HttpContext) {
+      return auth.user.role === UserRole.Admin;
    }
 }
